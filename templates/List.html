@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+    <div class="container mt-4">
+        <div class="row px-3">
+            <div class="text-md-right col-12">
+                <form class="form-inline" method="GET">
+                    <div class="form-group mb-2">
+                        <label for="staticEmail2" class="sr-only">Show date:</label>
+                        <input type="text" readonly class="form-control-plaintext" value="Show Date:">
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label for="date" class="sr-only">Date</label>
+                        <input type="date" class="form-control" id="date" name="date" placeholder="Date" value="{{date}}">
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-2">Submit</button>
+                </form>
+            </div>
+        </div>
+
+        {% for inventory in inventoryList %}
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title m-0">{{inventory['genre']}}</h4>
+                </div>
+                <div class="card-body px-1 py-1">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Tickets Left</th>
+                                <th>Tickets Available</th>
+                                <th>Status</th>
+                                <th>Price</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for inventoryData in inventory['inventory'] %}
+                                <tr>
+                                    <th>{{inventoryData['title']}}</th>
+                                    <th>{{inventoryData['left']}}</th>
+                                    <th>{{inventoryData['available']}}</th>
+                                    <th>{{inventoryData['status']}}</th>
+                                    <th>{{inventoryData['price']}}</th>
+                                    <th>
+                                        {% if inventoryData['showBook'] == 1 %}
+                                            <a href="/book/{{inventoryData['showID']}}?date={{date}}">
+                                                Book
+                                            </a>
+                                        {% endif %}
+                                    </th>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+{% endblock %}

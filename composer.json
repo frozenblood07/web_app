@@ -18,7 +18,9 @@
     "katzgrau/klogger": "dev-master",
     "zendframework/zend-diactoros": "^1.7.0",
     "woohoolabs/harmony": "^5.0",
-    "php-di/php-di": "^6.0"
+    "php-di/php-di": "^6.0",
+    "mustache/mustache": "^2.12",
+    "twig/twig": "~1.0"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "1.*",

@@ -9,6 +9,9 @@ namespace Ticket\Controllers;
 
 use Http\Request;
 use Http\Response;
+use Ticket\Services\ShowService;
+use Ticket\Template\Renderer;
+
 
 //use Psr\Http\Message\ResponseInterface;
 //use Psr\Http\Message\ServerRequestInterface;
@@ -18,11 +21,16 @@ class TicketController
 {
     private $request;
     private $response;
+    private $showService;
+    private $renderer;
     private $redisClient;
 
-    public function __construct(Request $request, Response $response,\Predis\Client $redisClient) {
+
+    public function __construct(Request $request, Response $response,\Predis\Client $redisClient, ShowService $showService, Renderer $renderer) {
         $this->request = $request;
         $this->response = $response;
+        $this->showService = $showService;
+        $this->renderer = $renderer;
         $this->redisClient = $redisClient;
     }
 
@@ -83,5 +91,54 @@ class TicketController
         //echo json_encode($dateWiseArr);die();
 
         $this->response->setContent("Population of redis db done please proceed to the main app");
+    }
+
+    public function inventoryList() {
+
+
+
+        $viewDate = $this->request->getParameter('date', date('Y-m-d'));
+        $inventoryList = $this->showService->getInventoryListForDate($viewDate);
+        $data = [
+            "inventoryList" => $inventoryList,
+            "date" => $viewDate
+        ];
+        $html = $this->renderer->render('List', $data);
+        $this->response->setContent($html);
+    }
+
+    public function show()
+    {
+        $data = [
+            'name' => $this->request->getParameter('name', 'stranger'),
+            'menuItems' => [['href' => '/', 'text' => 'Homepage']],
+        ];
+        $html = $this->renderer->render('Homepage', $data);
+        $this->response->setContent($html);
+    }
+
+
+    public function book($pathParams)
+    {
+        $showID = $pathParams['showID'];
+        $date = $this->request->getParameter('date');
+
+        $showData = $this->showService->getShowDataForBooking($showID,$date);
+        $data = [
+            "showData" => $showData
+        ];
+
+        $html = $this->renderer->render('Book', $data);
+
+        $this->response->setContent($html);
+    }
+
+    public function checkout($pathParams) {
+        $showID = $pathParams['showID'];
+        $orderParams = $this->request->getBodyParameters();
+
+        $response = $this->showService->generateOrderForBooking($showID,$pathParams);
+        $this->response->setHeader("Content-Type","application/json");
+        $this->response->setContent($response);
     }
 }

@@ -86,7 +86,7 @@ switch ($routeInfo[0]) {
         break;
 }
 //setting the header type and sending the response
-$response->setHeader("Content-Type","application/json");
+//$response->setHeader("Content-Type","application/json");
 foreach ($response->getHeaders() as $header) {
     header($header);
 }
