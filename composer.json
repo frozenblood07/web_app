@@ -1,0 +1,32 @@
+{
+  "name": "PHP Web Test App",
+  "description": "PHP Web Test App",
+  "authors": [
+    {
+      "name": "Karan",
+      "email": "karan.tuteja26@gmail.com",
+      "role": "Creator / Main Developer"
+    }
+  ],
+  "require": {
+    "php": ">=7.1.0",
+    "filp/whoops": "2.1",
+    "patricklouys/http": "1.4",
+    "nikic/fast-route": "1.3",
+    "rdlowrey/auryn": "1.4",
+    "predis/predis": "1.1",
+    "katzgrau/klogger": "dev-master",
+    "zendframework/zend-diactoros": "^1.7.0",
+    "woohoolabs/harmony": "^5.0",
+    "php-di/php-di": "^6.0"
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "1.*",
+    "phpunit/phpunit": "^7"
+  },
+  "autoload": {
+    "psr-4": {
+      "Ticket\\": "src/"
+    }
+  }
+}
