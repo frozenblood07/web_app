@@ -1,0 +1,70 @@
+:root {
+  --font-color: #373a3c;
+}
+
+body {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--font-color);
+  background-color: #f3f3f3;
+  font-family: 'Roboto', sans-serif;
+}
+
+.navbar {
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.navbar-brand {
+  color: var(--font-color) !important;
+}
+
+.card {
+  -webkit-box-shadow: 0 2px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.875rem;
+  border-radius: 0;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.card-header {
+    background-color: white;
+    border-bottom: 1px solid #EEE;
+}
+
+.card-title {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.card-footer {
+    background-color: white;
+}
+
+.table-responsive table>thead>tr>th {
+    border-top-width: 0;
+    border-bottom-color: #E3EBF3;
+}
+
+.table-responsive table>tbody>tr>td {
+    vertical-align: middle;
+}
+
+.form-control {
+    padding: .5rem .75rem;
+    font-size: 1rem;
+    line-height: 1.25;
+    color: #55595C;
+    background-color: #FFF;
+    background-image: none;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: .18rem;
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -moz-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
