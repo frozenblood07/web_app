@@ -40,9 +40,9 @@ jQuery(document).ready(function() {
       data: data,
       success: function(response) {
         if(response.status) {
-          alert(response.outputParams.data.msg)
+          alert(response.outputParams.data.msg);
         } else {
-          alert(response.error_msg)
+          alert(response.errorMsg);
         }
       },
         error: function() {

@@ -41,7 +41,7 @@
                             <tbody>
                             {% for inventoryData in inventory['inventory'] %}
                                 <tr>
-                                    <th>{{inventoryData['title']}}</th>
+                                    <th>{{inventoryData['name']}}</th>
                                     <th>{{inventoryData['left']}}</th>
                                     <th>{{inventoryData['available']}}</th>
                                     <th>{{inventoryData['status']}}</th>
@@ -61,6 +61,19 @@
                 </div>
             </div>
         {% endfor %}
+
+        {% if inventoryList|length == 0 %}
+            <div class="card">
+            <div class="card-header">
+                <h4 class="card-title m-0">{{inventory['genre']}}</h4>
+            </div>
+            <div class="card-body px-1 py-1">
+                <div class="table-responsive" style="text-align: center">
+                    No records found
+                </div>
+            </div>
+        </div>
+        {% endif %}
 
     </div>
 {% endblock %}

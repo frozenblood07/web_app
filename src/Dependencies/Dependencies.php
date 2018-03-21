@@ -35,26 +35,11 @@ $injector->delegate('Twig_Environment', function () use ($injector) {
 $injector->alias('Http\Response', 'Http\HttpResponse');
 $injector->share('Http\HttpResponse');
 
-
+$injector->share("Ticket\Utilities\Validator");
+$injector->share("Ticket\Utilities\ResponseFormatter");
 $injector->share("Ticket\Services\ShowService");
-//$injector->share("Ticket\Models\Show");
 
 $injector->alias('Ticket\Template\Renderer', 'Ticket\Template\TwigRenderer');
-
-$params = parse_ini_file(__DIR__ . '/../../config/database/database_'.ENVIRONMENT.'.ini');
-if ($params === false) {
-    throw new \Exception("Error reading database configuration file");
-}
-
-$conStr = sprintf("mysql:host=%s;port=%d;dbname=%s",
-    $params['host'],
-    $params['port'],
-    $params['database']);
-
-$pdo = new \PDO($conStr, $params['user'], $params['password']);
-
-$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-$injector->share($pdo);
 
 $redisParams = parse_ini_file(__DIR__ . '/../../config/redis/redis_'.ENVIRONMENT.'.ini');
 

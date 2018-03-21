@@ -2,7 +2,7 @@
 /**
  * File: ShowService.php
  * User: karan.tuteja26@gmail.com
- * Description:
+ * Description: Aggregator for show modules
  */
 
 namespace Ticket\Services;
@@ -12,46 +12,68 @@ use Ticket\Repositories\ShowRepository;
 
 class ShowService
 {
-    private $show;
     private $showRepository;
-    /*
-    public function __construct(Show $show, ShowRepository $showRepository) {
-        $this->show  = $show;
+    
+    public function __construct(ShowRepository $showRepository) {
         $this->showRepository = $showRepository;
-    }*/
+    }
 
+    /**
+     * Inventory information for a date
+     * @param $date
+     * @return array
+     */
     public function getInventoryListForDate($date) {
-        //$this->showRepository->
+        //getting an array containing show model obj
+        $showObjArr = $this->showRepository->getShowInventoryListByDate($date);
+
+        //formatting data for rendering
         $data = array();
-        $data[0]['genre'] = "Musician";
-        $data[0]['inventory'] = array(array('showID' => 1,'title'=>'cats','left'=>'50','available'=>0,'status'=>'open for sale','price' => '70', 'showBook'=>1),
-            array('showID' => 2,'title'=>'cats2','left'=>'50','available'=>'3','status'=>'open for sale','price' => '70'));
-        $data[1]['genre'] = "Comedy";
-        $data[1]['inventory'] = array(array('showID' => 3,'title'=>'cats3','left'=>'50','available'=>'3','status'=>'open for sale','price' => '70'),
-            array('showID' => 4,'title'=>'cats4','left'=>'50','available'=>'3','status'=>'open for sale','price' => '70'));
+        $pos = 0;
+        $genreKey = array();
 
-        $data[2]['genre'] = "Horror";
-        $data[2]['inventory'] = array(array('showID' => 5,'title'=>'cats5','left'=>'50','available'=>'3','status'=>'open for sale','price' => '70'),
-            array('showID' => 6,'title'=>'cats6','left'=>'50','available'=>'3','status'=>'open for sale','price' => '70'));
+        foreach ($showObjArr as $show) {
+            $showData = $show->getShowData($date);
+            if(! array_key_exists($showData['genre'],$genreKey) ) {
+                $genreKey[$showData['genre']] = $pos;
+                $data[$pos]['genre'] = $showData['genre'];
+                $data[$pos]['inventory'] = array();
+                $pos++;
+            }
 
+            array_push($data[$genreKey[$showData['genre']]]['inventory'] , $showData);
+        }
 
-        //echo json_encode($data);die();
         return $data;
     }
 
+    /**
+     * returns data of show for booking
+     * @param $showID
+     * @param $date
+     * @return mixed
+     */
     public function getShowDataForBooking($showID,$date){
 
-        $data = array('showID' => 1, 'price'=>70, 'title'=>'cats','available'=>'3','date' => '2018-06-01');
-        //echo json_encode($data);die();
+        $showObj = $this->showRepository->getShowData($showID);
+        $data = array();
+        if(! empty($showObj)) {
+            $data = $showObj->getShowData($date);
+        }
+
+
         return $data;
 
     }
 
+    /**
+     * booking a ticket
+     * @param $showID
+     * @param $orderParams
+     * @return array|string
+     */
     public function generateOrderForBooking($showID,$orderParams) {
-        //$data = array('status' => false,'error_msg' => 'Quantity not allowed');
-
-        $data = array('status' => true, 'outputParams' => array('data'=> array('orderID' => '1','msg'=> 'Generated successfully')));
-        $data = json_encode($data);
+        $data = $this->showRepository->generateOrderForShow($showID,$orderParams);
         return $data;
     }
 }
