@@ -104,22 +104,9 @@ class TicketController
             $this->redisClient->sadd(REDIS_DATE_PREFIX.$date,$showIDArr);
         }
 
-        $orderData = array(
-            json_encode(array('orderID' => 1, 'showID' => 3, 'tickets' => 3,'date' => '2018-04-28','price' => 70)),
-            json_encode(array('orderID' => 2, 'showID' => 3, 'tickets' => 2,'date' => '2018-04-28','price' => 70)),
-            json_encode(array('orderID' => 3, 'showID' => 3, 'tickets' => 2,'date' => '2018-04-28','price' => 70)),
-            json_encode(array('orderID' => 5, 'showID' => 3, 'tickets' => 4,'date' => '2018-05-28','price' => 70)),
-            json_encode(array('orderID' => 6, 'showID' => 3, 'tickets' => 3,'date' => '2018-03-28','price' => 70))
-        );
+        //set the latest order id
+        $this->redisClient->set(LATEST_ORDER_ID,1);
 
-        $this->redisClient->sadd(REDIS_ORDER_PREFIX.'3',$orderData);
-
-        $orderData = array(
-            json_encode(array('orderID' => 4, 'showID' => 46, 'tickets' => 2,'date' => '2018-04-28','price' => 70)),
-            json_encode(array('orderID' => 7, 'showID' => 46, 'tickets' => 4,'date' => '2018-04-30','price' => 70))
-        );
-
-        $this->redisClient->sadd(REDIS_ORDER_PREFIX.'46',$orderData);
 
         $this->response->setContent("Population of redis db done please proceed to the main app");
     }
@@ -143,15 +130,6 @@ class TicketController
         $this->response->setContent($html);
     }
 
-    public function show()
-    {
-        $data = [
-            'name' => $this->request->getParameter('name', 'stranger'),
-            'menuItems' => [['href' => '/', 'text' => 'Homepage']],
-        ];
-        $html = $this->renderer->render('Homepage', $data);
-        $this->response->setContent($html);
-    }
 
     /**
      * booking information
@@ -207,25 +185,4 @@ class TicketController
         $this->response->setContent($response['response']);
     }
 
-    public function orderBook() {
-
-        $orderData = array(
-            json_encode(array('orderID' => 1, 'showID' => 3, 'tickets' => 3,'date' => '2018-04-28','price' => 70)),
-            json_encode(array('orderID' => 2, 'showID' => 3, 'tickets' => 2,'date' => '2018-04-28','price' => 70)),
-            json_encode(array('orderID' => 3, 'showID' => 3, 'tickets' => 2,'date' => '2018-04-28','price' => 70)),
-            json_encode(array('orderID' => 5, 'showID' => 3, 'tickets' => 4,'date' => '2018-05-28','price' => 70)),
-            json_encode(array('orderID' => 6, 'showID' => 3, 'tickets' => 3,'date' => '2018-03-28','price' => 70))
-        );
-
-        $this->redisClient->sadd(REDIS_ORDER_PREFIX.'3',$orderData);
-
-        $orderData = array(
-            json_encode(array('orderID' => 4, 'showID' => 46, 'tickets' => 2,'date' => '2018-04-28','price' => 70)),
-            json_encode(array('orderID' => 7, 'showID' => 46, 'tickets' => 4,'date' => '2018-04-30','price' => 70))
-        );
-
-        $this->redisClient->sadd(REDIS_ORDER_PREFIX.'46',$orderData);
-
-        $this->response->setContent('Done');
-    }
 }
