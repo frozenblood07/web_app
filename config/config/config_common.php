@@ -18,7 +18,7 @@ define('REDIS_SHOW_PREFIX','showInfo|');
 define('REDIS_DATE_PREFIX','dateShow|');
 define('REDIS_ORDER_PREFIX','orderInfo|');
 
-define('TICKET_SELLING_START_THRESHOLD',40);
+define('TICKET_SELLING_START_THRESHOLD',25);
 
 define('TOTAL_SHOWS',100);
 define('BIG_HALL_SHOWS',60);
