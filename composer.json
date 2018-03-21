@@ -16,9 +16,6 @@
     "rdlowrey/auryn": "1.4",
     "predis/predis": "1.1",
     "katzgrau/klogger": "dev-master",
-    "zendframework/zend-diactoros": "^1.7.0",
-    "woohoolabs/harmony": "^5.0",
-    "php-di/php-di": "^6.0",
     "mustache/mustache": "^2.12",
     "twig/twig": "~1.0"
   },
