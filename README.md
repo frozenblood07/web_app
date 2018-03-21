@@ -55,11 +55,19 @@ The inventory listing url is below you should be able to use the navigate to oth
 
  **If by any chance the docker is not working properly. Then follow the following steps**
  - Go to web/ directory in root folder and run the command 
- ``` php -S localhost //This will start a server on your local system ```
+ ``` php -S localhost:8000 //This will start a server on your local system ```
  - Go to the **config/redis/redis_development.ini** file and enter your systems redis configuration.
  
-   Then you can the above mentioned urls and traverse the system
+   Then you can the above mentioned urls with the port 8000 and traverse the system
  
+ ### Database
+ The database used is **redis**.
+ 
+ Show info is kept in **hashmap**.
+ 
+ Data info for shows is kept in **sets**.
+ 
+ Order generated for show is kept in **sets**.
 
 ### -Libraries Used
 
