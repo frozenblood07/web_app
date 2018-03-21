@@ -1,4 +1,4 @@
-##JS Code Points
+## JS Code Points
 
 ### Things I liked
 - Used ES6.
