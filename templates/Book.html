@@ -3,6 +3,7 @@
 {% block content %}
 
     <div class="container mt-4">
+        {% if showData is not empty %}
         <div class="card">
             <div class="card-header">
                 <h4 class="card-title m-0">Checkout</h4>
@@ -20,7 +21,7 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>{{showData.title}}</td>
+                                <td>{{showData.name}}</td>
                                 <td>
                                     <label id="price">{{showData.price}}</label>
                                 </td>
@@ -28,7 +29,7 @@
                                     <input type="text" id="quantity" value="1" class="touchspin" data-bts-button-down-class="btn btn-primary" data-bts-button-up-class="btn btn-primary">
                                 </td>
                                 <td>
-                                    <label id="total">70</label>
+                                    <label id="total">{{showData.price}}</label>
                                 </td>
                             </tr>
                         </tbody>
@@ -39,6 +40,20 @@
                 <button class="btn btn-outline-primary" id="checkout" type="button">Checkout</button>
             </div>
         </div>
+        {% endif %}
+
+        {% if showData is empty %}
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title m-0">{{inventory['genre']}}</h4>
+            </div>
+            <div class="card-body px-1 py-1">
+                <div class="table-responsive" style="text-align: center">
+                    No show found
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
     <script type="text/javascript">

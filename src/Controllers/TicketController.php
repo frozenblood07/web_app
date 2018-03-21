@@ -1,8 +1,8 @@
 <?php
 /**
- * File: RecipeController.php
+ * File: TicketController.php
  * User: karan.tuteja26@gmail.com
- * Description: File will contain the recipe controller functions
+ * Description: File will contain the ticket controller action
  */
 
 namespace Ticket\Controllers;
@@ -11,11 +11,8 @@ use Http\Request;
 use Http\Response;
 use Ticket\Services\ShowService;
 use Ticket\Template\Renderer;
-
-
-//use Psr\Http\Message\ResponseInterface;
-//use Psr\Http\Message\ServerRequestInterface;
-
+use Ticket\Utilities\ResponseFormatter;
+use Ticket\Utilities\Validator;
 
 class TicketController
 {
@@ -23,15 +20,20 @@ class TicketController
     private $response;
     private $showService;
     private $renderer;
+    private $validator;
+    private $responseFormatter;
     private $redisClient;
 
 
-    public function __construct(Request $request, Response $response,\Predis\Client $redisClient, ShowService $showService, Renderer $renderer) {
+    public function __construct(Request $request, Response $response,\Predis\Client $redisClient, ShowService $showService, Renderer $renderer, Validator $validator, ResponseFormatter $responseFormatter ) {
         $this->request = $request;
         $this->response = $response;
         $this->showService = $showService;
         $this->renderer = $renderer;
+        $this->validator = $validator;
+        $this->responseFormatter = $responseFormatter;
         $this->redisClient = $redisClient;
+
     }
 
     /**
@@ -62,6 +64,7 @@ class TicketController
         $dateWiseArr = array();
 
         foreach ($arrShows as $show) {
+            if(!$show) break;
 
             $redisData = array();
             $redisData['showID'] = $showID;
@@ -69,11 +72,24 @@ class TicketController
             $redisData['date'] = trim($show[1]);
             $redisData['genre'] = trim($show[2]);
 
-            if(!is_array($dateWiseArr[$show[1]])) {
-                $dateWiseArr[$show[1]] = array();
+            for($i=0;$i<TOTAL_SHOWS;$i++) {
+
+                if($i == 0){
+                    $date =$show[1];
+                }else {
+
+                    $new_date = new \DateTime($date);
+                    $new_date->modify('+1 day');
+                    $date = $new_date->format('Y-m-d');
+                }
+
+                if (!is_array($dateWiseArr[$date])) {
+                    $dateWiseArr[$date] = array();
+                }
+
+                array_push($dateWiseArr[$date], $redisData['showID']);
             }
 
-            array_push($dateWiseArr[$show[1]],$redisData['showID']);
             $this->redisClient->hmset(REDIS_SHOW_PREFIX.$showID, $redisData);
             $showID++;
 
@@ -84,26 +100,46 @@ class TicketController
 
         //categorize the date wise show info
         foreach ($dateWiseArr as $date => $showIDArr) {
-            //var_dump($date);var_dump($showIDArr);die();
+
             $this->redisClient->sadd(REDIS_DATE_PREFIX.$date,$showIDArr);
         }
 
-        //echo json_encode($dateWiseArr);die();
+        $orderData = array(
+            json_encode(array('orderID' => 1, 'showID' => 3, 'tickets' => 3,'date' => '2018-04-28','price' => 70)),
+            json_encode(array('orderID' => 2, 'showID' => 3, 'tickets' => 2,'date' => '2018-04-28','price' => 70)),
+            json_encode(array('orderID' => 3, 'showID' => 3, 'tickets' => 2,'date' => '2018-04-28','price' => 70)),
+            json_encode(array('orderID' => 5, 'showID' => 3, 'tickets' => 4,'date' => '2018-05-28','price' => 70)),
+            json_encode(array('orderID' => 6, 'showID' => 3, 'tickets' => 3,'date' => '2018-03-28','price' => 70))
+        );
+
+        $this->redisClient->sadd(REDIS_ORDER_PREFIX.'3',$orderData);
+
+        $orderData = array(
+            json_encode(array('orderID' => 4, 'showID' => 46, 'tickets' => 2,'date' => '2018-04-28','price' => 70)),
+            json_encode(array('orderID' => 7, 'showID' => 46, 'tickets' => 4,'date' => '2018-04-30','price' => 70))
+        );
+
+        $this->redisClient->sadd(REDIS_ORDER_PREFIX.'46',$orderData);
 
         $this->response->setContent("Population of redis db done please proceed to the main app");
     }
 
+    /**
+     * Inventory list view
+     */
     public function inventoryList() {
 
-
-
         $viewDate = $this->request->getParameter('date', date('Y-m-d'));
+
         $inventoryList = $this->showService->getInventoryListForDate($viewDate);
+
         $data = [
             "inventoryList" => $inventoryList,
             "date" => $viewDate
         ];
+
         $html = $this->renderer->render('List', $data);
+
         $this->response->setContent($html);
     }
 
@@ -117,7 +153,10 @@ class TicketController
         $this->response->setContent($html);
     }
 
-
+    /**
+     * booking information
+     * @param $pathParams
+     */
     public function book($pathParams)
     {
         $showID = $pathParams['showID'];
@@ -133,12 +172,60 @@ class TicketController
         $this->response->setContent($html);
     }
 
+    /**
+     * order generation
+     * @param $pathParams
+     */
     public function checkout($pathParams) {
         $showID = $pathParams['showID'];
         $orderParams = $this->request->getBodyParameters();
+        $orderParams['showID'] = $showID;
 
-        $response = $this->showService->generateOrderForBooking($showID,$pathParams);
+        $requirements = array(
+            "showID" => array("required" => true, "type" => "int"),
+            "quantity" => array("required" => true, "type" => "int"),
+            "date" => array("required" => true,"type" => "date")
+        );
+
+        //validate the input
+        $validatorResponse = $this->validator->validateInput($requirements,$orderParams);
+
+        if(!$validatorResponse['status']) {
+            $response = $this->responseFormatter->generatorAPIResponseForFailure(BAD_REQUEST,$validatorResponse['msg']);
+        }else {
+            $response = $this->showService->generateOrderForBooking($showID,$orderParams);
+
+            if($response['status']) {
+                $response = $this->responseFormatter->generatorAPIResponseForSuccess(DATA_FOUND,$response);
+            } else {
+                $response = $this->responseFormatter->generatorAPIResponseForFailure(DATA_ERROR,$response['errorMsg']);
+            }
+        }
+
         $this->response->setHeader("Content-Type","application/json");
-        $this->response->setContent($response);
+        $this->response->setStatusCode($response['statusCode']);
+        $this->response->setContent($response['response']);
+    }
+
+    public function orderBook() {
+
+        $orderData = array(
+            json_encode(array('orderID' => 1, 'showID' => 3, 'tickets' => 3,'date' => '2018-04-28','price' => 70)),
+            json_encode(array('orderID' => 2, 'showID' => 3, 'tickets' => 2,'date' => '2018-04-28','price' => 70)),
+            json_encode(array('orderID' => 3, 'showID' => 3, 'tickets' => 2,'date' => '2018-04-28','price' => 70)),
+            json_encode(array('orderID' => 5, 'showID' => 3, 'tickets' => 4,'date' => '2018-05-28','price' => 70)),
+            json_encode(array('orderID' => 6, 'showID' => 3, 'tickets' => 3,'date' => '2018-03-28','price' => 70))
+        );
+
+        $this->redisClient->sadd(REDIS_ORDER_PREFIX.'3',$orderData);
+
+        $orderData = array(
+            json_encode(array('orderID' => 4, 'showID' => 46, 'tickets' => 2,'date' => '2018-04-28','price' => 70)),
+            json_encode(array('orderID' => 7, 'showID' => 46, 'tickets' => 4,'date' => '2018-04-30','price' => 70))
+        );
+
+        $this->redisClient->sadd(REDIS_ORDER_PREFIX.'46',$orderData);
+
+        $this->response->setContent('Done');
     }
 }
