@@ -1,0 +1,4 @@
+#development
+
+DEBUG=true
+ENVIRONMENT=development
