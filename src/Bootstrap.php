@@ -20,15 +20,17 @@ use Zend\Diactoros\Response\SapiEmitter;
 use Zend\Diactoros\ServerRequestFactory;
 
 
-//$ENVIRONMENT = getenv('ENVIRONMENT');
-$ENVIRONMENT = "development";
+$ENVIRONMENT = getenv('ENVIRONMENT');
+
+if(!$ENVIRONMENT) {
+    $ENVIRONMENT = "development";
+}
 
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . "/../config/config/config.php";
 
 error_reporting(ERROR_LEVEL);
-//$logger = new \Katzgrau\KLogger\Logger(LOG_PATH, LOG_LEVEL,array ('extension' => 'log'));
-//$logger->error("Exception ");
+
 /**
  * Register the error handler
  */
@@ -85,8 +87,7 @@ switch ($routeInfo[0]) {
         $class->$method($vars);//call the call method
         break;
 }
-//setting the header type and sending the response
-//$response->setHeader("Content-Type","application/json");
+
 foreach ($response->getHeaders() as $header) {
     header($header);
 }
