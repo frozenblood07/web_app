@@ -1,0 +1,15 @@
+version: '2.0'
+
+services:
+   redis:
+    build: redis
+    ports:
+     - "6379:6379"
+   web-server:
+    build: php-server
+    links:
+     - redis:redis
+    volumes:
+     - ./:/var/www/
+    ports:
+     - "80:80"
